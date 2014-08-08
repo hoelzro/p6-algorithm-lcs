@@ -1,3 +1,44 @@
+use v6;
+
+=head1 TITLE
+Algorithm::LCS
+=head1 SYNOPSIS
+=begin code
+    use Algorithm::LCS;
+
+    # regular usage
+    say lcs(<A B C D E F G>, <A C F H J>); # prints T<A C F>
+
+    # custom comparator via :compare
+    say lcs(<A B C>, <D C F>, :compare(&infix:<eq>));
+
+    # extra special custom comparison via :compare-i
+    my @a        = slurp('one.txt');
+    my @b        = slurp('two.txt');
+    my @a-hashed = @a.map({ hash-algorithm($_) });
+    my @b-hashed = @b.map({ hash-algorithm($_) });
+    say lcs(@a, @b, :compare-i({ @a-hashed[$^i] eqv @b-hashed[$^j] }));
+=end code
+=begin head1
+DESCRIPTION
+
+This module contains a single subroutine, C<lcs>, that calculates
+the longest common subsequence between two sequences of data.  C<lcs>
+takes two lists as required parameters; you may also specify the comparison
+function (which defaults to C<eqv>) via the C<&compare> named parameter).
+Sometimes you may want to maintain a parallel array of information to
+consult during calculation (for example, if you're comparing long lines
+of a file, and you'd like a speedup by comparing their hashes rather than
+their contents); for that, you may use the C<&compare-i> named parameter.
+
+=end head1
+
+=begin head1
+SEE ALSO
+
+http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
+=end head1
+
 module Algorithm::LCS:ver<0.0.1>:auth<hoelzro> {
     my sub strip-prefix(@a, @b, &compare-i) {
         my $i = 0;
@@ -34,7 +75,13 @@ module Algorithm::LCS:ver<0.0.1>:auth<hoelzro> {
         @matrix
     }
 
-    our sub lcs(@a, @b, :&compare=&infix:<eqv>, :&compare-i is copy) is export {
+    #| Returns the longest common subsequence of two sequences of data.
+    our sub lcs(
+        @a,                     #= The first sequence
+        @b,                     #= The second sequence
+        :&compare=&infix:<eqv>, #= The comparison function (defaults to C<eqv>)
+        :&compare-i is copy     #= The compare-by-index function (defaults to using &compare)
+    ) is export {
         unless &compare-i.defined {
             &compare-i = -> $i, $j {
                 &compare(@a[$i], @b[$j])
