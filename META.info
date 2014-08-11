@@ -4,5 +4,5 @@
     "description": "Implementation of the longest common subsequence algorithm",
     "author": "Rob Hoelz",
     "depends": [],
-    "source-url": "git://github.com/hoelzro/p6-algorithm-lcs"
+    "source-url": "git://github.com/hoelzro/p6-algorithm-lcs.git"
 }
